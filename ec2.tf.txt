@@ -10,17 +10,30 @@ data "aws_ami" "ubuntu" {
     name   = "virtualization-type"
     values = ["hvm"]
   }
+
+  
   owners = ["099720109477"]
 }
+
+
 
 resource "aws_instance" "my-ec2" {
  ami = data.aws_ami.ubuntu.id
  instance_type = "t2.micro"
- subnet_id = aws_subnet.demosubnet[0].id
- vpc_security_group_ids =[aws_security_group.web-sg.id]
- associate_public_ip_address="true"
- key_name =var.keyname
+ subnet_id = aws_subnet.demosubnet[1].id
+ security_groups = [ "${aws_security_group.web-sg.id}" ]
+ associate_public_ip_address=true
+ key_name ="indraja-useast-keypair"
  tags ={
     Name="web"
     }  
 }    
+
+resource "aws_s3_bucket" "b" {
+  bucket = "jahnavi-sample-bucket"
+
+  tags = {
+    Name        = "jahnavi-sample-bucket"
+    Environment = "Dev"
+  }
+}

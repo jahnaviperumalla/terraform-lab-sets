@@ -21,9 +21,22 @@ resource "aws_subnet" "demosubnet" {
   map_public_ip_on_launch = true
   availability_zone = var.azs[count.index]
   tags = {
-    Name = "subnet $[count.index]"
+    Name = "subnets"
   }
 }
+
+
+resource "aws_subnet" "dbsubnet" {
+  count= length(var.pvtsub)  
+  vpc_id                  = "${aws_vpc.demovpc.id}"
+  cidr_block             = var.pvtsub[count.index]
+  map_public_ip_on_launch = true
+  availability_zone = var.azs[count.index]
+  tags = {
+    Name = "subnets"
+  }
+}
+
 
 # Creating an Elastic IP for the NAT Gateway!
 resource "aws_eip" "nat-gateway-eip" {
@@ -74,12 +87,12 @@ resource "aws_route_table_association" "rt2" {
 }
 
 resource "aws_route_table_association" "rt3" {
-   subnet_id = "${aws_subnet.demosubnet[2].id}"
+   subnet_id = "${aws_subnet.dbsubnet[0].id}"
    route_table_id = "${aws_route_table.privateroute.id}"
 }
 
 resource "aws_route_table_association" "rt4" {
-   subnet_id = "${aws_subnet.demosubnet[3].id}"
+   subnet_id = "${aws_subnet.dbsubnet[1].id}"
    route_table_id = "${aws_route_table.privateroute.id}"
 }   
 
